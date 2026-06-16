@@ -2,6 +2,7 @@ const express = require("express")
 const { isLoggedIn } = require("../middlewares/isLoggedIn")
 const { Post } = require("../models/post.model")
 const router = express.Router()
+const mongoose = require("mongoose")
 
 
 
@@ -34,6 +35,33 @@ router.post("/create", isLoggedIn, async(req, res) => {
     }
 })
 
+router.get("/:id", isLoggedIn, async(req, res) => {
+    try {
+            const {id} = req.params
+
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                throw new Error("Invalid Id")
+            
+            }
+
+            const post = await Post.findById(id)
+
+            if(!post)
+            {
+                throw new Error("post not found")
+            }
+
+            res.status(200).json({
+                success: true,
+                post
+            })
+
+
+
+    } catch (error) {
+        res.status(400).json({ err: error.message })
+    }
+})
 
 
 
