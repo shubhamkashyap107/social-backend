@@ -91,6 +91,30 @@ router.delete("/:postId", isLoggedIn, async (req, res) => {
     }
 })
 
+router.get("/my-posts", isLoggedIn, async (req, res) => {
+  try {
+    const posts = await Post.find({authorId: req.user._id});
+
+    if (posts.length === 0) {
+      return res.status(200).json({
+        success: true,
+        msg: "No posts found",
+        data: [],
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      posts,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      err: error.message,
+    });
+  }
+});
+
 router.put("/:id", isLoggedIn, async (req, res) => {
   try {
     const { caption, imageUrl } = req.body;
@@ -127,6 +151,8 @@ router.put("/:id", isLoggedIn, async (req, res) => {
     });
   }
 });
+
+
 
 
 module.exports = {
