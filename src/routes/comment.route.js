@@ -49,7 +49,7 @@ router.post("/create-comment", isLoggedIn, async(req, res) => {
 })
 
 
-router.delete("/delete-comment/:id", isLoggedIn, async (req, res) => {
+router.delete("/:id", isLoggedIn, async (req, res) => {
   try 
   {
     const comment = await Comment.findById(req.params.id);
