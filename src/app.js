@@ -6,7 +6,9 @@ const cp = require("cookie-parser")
 const { authRouter } = require("./routes/auth.route")
 const { profileRouter } = require("./routes/profile.route")
 const { postRouter } = require("./routes/post.route")
+
 const {commentRouter} = require("./routes/comment.route")
+
 const PORT = process.env.PORT || 8080
 const cors = require("cors")
 
