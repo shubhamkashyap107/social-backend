@@ -86,6 +86,44 @@ router.delete("/:id", isLoggedIn, async (req, res) => {
   }
 });
 
+router.patch("/like/:commentId", isLoggedIn , async(req, res)=>{
+  try {
+    const {commentId} = req.params
+    const foundUser = req.user
+
+    const foundComment = await Comment.findById(commentId)
+
+    if(!foundComment){
+      throw new Error("Comment not found");
+    }
+
+    const alreadyLiked = foundComment.likes.some(user => user.toString() == foundUser._id.toString())
+
+    if(alreadyLiked)
+      {
+        foundComment.likes=foundComment.likes.filter( user => user.toString() !== foundUser._id.toString())
+      }
+    else
+      {
+        foundComment.likes.push(foundUser._id)
+      }
+
+    await foundComment.save()
+
+      res.status(200).json({
+            success:true,
+            msg:"Comment likes/dislikes updated",
+            data:foundComment
+        })
+    }
+
+    catch(error){
+        res.status(400).json({
+            err:error.message
+        })
+    }
+})
+
 module.exports = {
     commentRouter: router
 }

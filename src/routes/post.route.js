@@ -33,6 +33,30 @@ router.post("/create", isLoggedIn, async(req, res) => {
     }
 })
 
+router.get("/my-posts", isLoggedIn, async (req, res) => {
+  try {
+    const posts = await Post.find({authorId: req.user._id}).populate("comments");
+
+    if (posts.length === 0) {
+      return res.status(200).json({
+        success: true,
+        msg: "No posts found",
+        data: [],
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      posts,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      err: error.message,
+    });
+  }
+});
+
 router.get("/:id", isLoggedIn, async(req, res) => {
     try {
             const {id} = req.params
@@ -91,29 +115,6 @@ router.delete("/:postId", isLoggedIn, async (req, res) => {
     }
 })
 
-router.get("/my-posts", isLoggedIn, async (req, res) => {
-  try {
-    const posts = await Post.find({authorId: req.user._id}).populate("comments");
-
-    if (posts.length === 0) {
-      return res.status(200).json({
-        success: true,
-        msg: "No posts found",
-        data: [],
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      posts,
-    });
-  } catch (error) {
-    res.status(400).json({
-      success: false,
-      err: error.message,
-    });
-  }
-});
 
 router.put("/:id", isLoggedIn, async (req, res) => {
   try {
