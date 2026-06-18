@@ -33,10 +33,9 @@ router.post("/create", isLoggedIn, async(req, res) => {
     }
 })
 
-
 router.get("/my-posts", isLoggedIn, async (req, res) => {
   try {
-    const posts = await Post.find({ authorId: req.user._id });
+    const posts = await Post.find({authorId: req.user._id}).populate("comments");
 
     if (posts.length === 0) {
       return res.status(200).json({
@@ -115,7 +114,6 @@ router.delete("/:postId", isLoggedIn, async (req, res) => {
         })
     }
 })
-
 
 
 router.put("/:id", isLoggedIn, async (req, res) => {
