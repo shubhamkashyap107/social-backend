@@ -86,6 +86,65 @@ router.delete("/:id", isLoggedIn, async (req, res) => {
   }
 });
 
+
+
+
+router.post("/like/:commentId", isLoggedIn, async (req, res) => {
+    try {
+        const foundUser = req.user
+        const { commentId } = req.params
+
+        const comment = await Comment.findById(commentId)
+
+        if (!comment) {
+            throw new Error("Comment not found")
+        }
+
+        if (!comment.likes.includes(foundUser._id)) {
+            comment.likes.push(foundUser._id)
+            await comment.save()
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Comment liked successfully"
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        })
+    }
+})
+
+router.post("/dislike/:commentId", isLoggedIn, async (req, res) => {
+    try {
+        const foundUser = req.user
+        const { commentId } = req.params
+
+        const comment = await Comment.findById(commentId)
+
+        if (!comment) {
+           throw new Error("Comment not found")
+        }
+
+        comment.likes.pull(foundUser._id)
+        await comment.save()
+
+        return res.status(200).json({
+            success: true,
+            message: "Comment disliked successfully"
+        })
+
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        })
+    }
+})
+
 module.exports = {
     commentRouter: router
 }
