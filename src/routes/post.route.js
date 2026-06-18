@@ -153,7 +153,7 @@ router.put("/:id", isLoggedIn, async (req, res) => {
       err: error.message,
     });
   }
-});
+})
 
 
 router.patch("/like/:postId", isLoggedIn, async (req, res) => {
@@ -204,7 +204,7 @@ router.patch("/like/:postId", isLoggedIn, async (req, res) => {
       err: error.message,
     });
   }
-});
+})
 
 
 module.exports = {
