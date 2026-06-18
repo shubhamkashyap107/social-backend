@@ -8,8 +8,7 @@ const { isLoggedIn } = require("../middlewares/isLoggedIn")
 router.put("/complete",isLoggedIn, async(req, res) => {
     try {
         const{firstName, lastName, dateOfBirth, gender, displayPicture, bio} = req.body
-        // console.log(displayPicture, dateOfBirth, gender)
-        // const{ userId } = req.params
+       
         const foundUser = req.user
 
         if(!firstName || !lastName || !dateOfBirth || !gender)
@@ -142,6 +141,65 @@ router.patch("/edit/dp", isLoggedIn, async(req, res) => {
     } catch (error) {
         res.status(400).json({
             err : error.message
+        })
+    }
+})
+
+router.patch("/follow/:userId",isLoggedIn,async(req,res)=>{
+    try 
+    {
+        const {userId} = req.params();
+        const foundUser = req.user
+
+        const targetUser = await User.findById(userId)
+
+        if(!targetUser)
+        {
+            throw new Error("User not found")
+        }
+
+        if(targetUser._id.toString() == foundUser._id.toString())
+        {
+            throw new Error("You cannot follow yourself")
+        }
+        const alreadyFollowing = foundUser.following.some(user => user.toString() == userId)
+
+        if(alreadyFollowing)
+        {
+            foundUser.following.filter((user)=>{
+                return user.toString() !== userId
+            })
+
+            targetUser.followers = targetUser.followers.filter((user)=>{
+                return user.toString() !== userId
+            })
+
+            await foundUser.save()
+            await targetUser.save()
+
+            return  res.status(200).json({
+                success : true,
+                msg : "User unfollowed Successfully"
+            })
+        }
+        foundUser.following.push(targetUser._id)
+        targetUser.followers.push(foundUser._id)
+
+        await foundUser.save()
+        await targetUser.save()
+
+        res.status(200).json({
+            success : true,
+            msg : "user followed Successfully"
+        })
+
+
+    } 
+    catch (error) 
+    {
+        res.status(400).json({
+            success : false,
+            msg : error.message
         })
     }
 })
