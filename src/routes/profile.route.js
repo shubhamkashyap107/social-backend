@@ -1,10 +1,16 @@
-const express = require("express")
-const router = express.Router()
-const validator = require("validator")
-const { User } = require("../models/user.model")
-const { isLoggedIn } = require("../middlewares/isLoggedIn")
+const express = require("express");
+const router = express.Router();
+const validator = require("validator");
+const { User } = require("../models/user.model");
+const { isLoggedIn } = require("../middlewares/isLoggedIn");
 
+router.put("/complete", isLoggedIn, async (req, res) => {
+  try {
+    const { firstName, lastName, dateOfBirth, gender, displayPicture, bio } =
+      req.body;
+    const foundUser = req.user;
 
+<<<<<<< HEAD
 router.put("/complete",isLoggedIn, async(req, res) => {
     try {
         const{firstName, lastName, dateOfBirth, gender, displayPicture, bio} = req.body
@@ -58,93 +64,97 @@ router.put("/complete",isLoggedIn, async(req, res) => {
         res.status(400).json({
             err : error.message
         })
+=======
+    if (!firstName || !lastName || !dateOfBirth || !gender) {
+      throw new Error("Firstname, lastname, gender and DOB are required..");
+>>>>>>> a5405d4 (create follower and following routes)
     }
-})
 
-router.patch("/edit", isLoggedIn ,async(req, res) => {
-    try {
-        const{ firstName, lastName, bio } = req.body
-
-
-
-        const loggedInUser = req.user
-
-        loggedInUser.firstName = firstName
-        loggedInUser.lastName = lastName
-        // loggedInUser.displayPicture = displayPicture
-        loggedInUser.bio = bio
-
-        await loggedInUser.save()
-
-        res.status(200).json({
-            success : true,
-            msg : "Profile Updated...",
-            data : {
-                email : loggedInUser.email,
-                username : loggedInUser.username,
-                firstName : loggedInUser.firstName,
-                lastName : loggedInUser.lastName,
-                bio : loggedInUser.bio,
-                gender : loggedInUser.gender,
-                dateOfBirth : loggedInUser.dateOfBirth,
-                displayPicture : loggedInUser.displayPicture,
-                followers : loggedInUser.followers,
-                following : loggedInUser.following,
-                posts : loggedInUser.posts,
-                isCompletedProfile : loggedInUser.isCompletedProfile
-            }
-        })
-        
-
-    } catch (error) {
-        res.status(400).json({
-            err : error.message
-        })
+    if (!validator.isDate(dateOfBirth)) {
+      throw new Error("Invalid Date");
     }
-})
 
-router.patch("/edit/dp", isLoggedIn, async(req, res) => {
-    try {
-        const{displayPicture} = req.body
-        console.log(displayPicture)
+    foundUser.firstName = firstName;
+    foundUser.lastName = lastName;
+    foundUser.bio = bio;
+    foundUser.gender = gender;
+    foundUser.dateOfBirth = dateOfBirth;
+    foundUser.displayPicture = displayPicture;
+    foundUser.isCompletedProfile = true;
 
-        if(!validator.isURL(displayPicture))
-        {
-            throw new Error("Please provide a valid picture")
-        }
+    await foundUser.save();
 
-        const loggedInUser = req.user
-        loggedInUser.displayPicture = displayPicture
-        await loggedInUser.save()
+    res.status(200).json({
+      success: true,
+      msg: "Profile updated",
+      data: {
+        email: foundUser.email,
+        username: foundUser.username,
+        firstName: foundUser.firstName,
+        lastName: foundUser.lastName,
+        bio: foundUser.bio,
+        gender: foundUser.gender,
+        dateOfBirth: foundUser.dateOfBirth,
+        displayPicture: foundUser.displayPicture,
+        followers: foundUser.followers,
+        following: foundUser.following,
+        posts: foundUser.posts,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      err: error.message,
+    });
+  }
+});
 
-        res.json({
-            success : true,
-            msg : "Profile Picture updated..",
-            data : {
-                email : loggedInUser.email,
-                username : loggedInUser.username,
-                firstName : loggedInUser.firstName,
-                lastName : loggedInUser.lastName,
-                bio : loggedInUser.bio,
-                gender : loggedInUser.gender,
-                dateOfBirth : loggedInUser.dateOfBirth,
-                displayPicture : loggedInUser.displayPicture,
-                followers : loggedInUser.followers,
-                following : loggedInUser.following,
-                posts : loggedInUser.posts,
-                isCompletedProfile : loggedInUser.isCompletedProfile
-            }
-        })
+router.patch("/edit", isLoggedIn, async (req, res) => {
+  try {
+    const { firstName, lastName, bio } = req.body;
 
-        // console.log("OK")
+    const loggedInUser = req.user;
 
-    } catch (error) {
-        res.status(400).json({
-            err : error.message
-        })
+    loggedInUser.firstName = firstName;
+    loggedInUser.lastName = lastName;
+    loggedInUser.bio = bio;
+
+    await loggedInUser.save();
+
+    res.status(200).json({
+      success: true,
+      msg: "Profile Updated...",
+      data: {
+        email: loggedInUser.email,
+        username: loggedInUser.username,
+        firstName: loggedInUser.firstName,
+        lastName: loggedInUser.lastName,
+        bio: loggedInUser.bio,
+        gender: loggedInUser.gender,
+        dateOfBirth: loggedInUser.dateOfBirth,
+        displayPicture: loggedInUser.displayPicture,
+        followers: loggedInUser.followers,
+        following: loggedInUser.following,
+        posts: loggedInUser.posts,
+        isCompletedProfile: loggedInUser.isCompletedProfile,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      err: error.message,
+    });
+  }
+});
+
+router.patch("/edit/dp", isLoggedIn, async (req, res) => {
+  try {
+    const { displayPicture } = req.body;
+    console.log(displayPicture);
+
+    if (!validator.isURL(displayPicture)) {
+      throw new Error("Please provide a valid picture");
     }
-})
 
+<<<<<<< HEAD
 router.patch("/follow/:userId",isLoggedIn,async(req,res)=>{
     try 
     {
@@ -204,7 +214,90 @@ router.patch("/follow/:userId",isLoggedIn,async(req,res)=>{
     }
 })
 
+=======
+    const loggedInUser = req.user;
+    loggedInUser.displayPicture = displayPicture;
+    await loggedInUser.save();
+
+    res.json({
+      success: true,
+      msg: "Profile Picture updated..",
+      data: {
+        email: loggedInUser.email,
+        username: loggedInUser.username,
+        firstName: loggedInUser.firstName,
+        lastName: loggedInUser.lastName,
+        bio: loggedInUser.bio,
+        gender: loggedInUser.gender,
+        dateOfBirth: loggedInUser.dateOfBirth,
+        displayPicture: loggedInUser.displayPicture,
+        followers: loggedInUser.followers,
+        following: loggedInUser.following,
+        posts: loggedInUser.posts,
+        isCompletedProfile: loggedInUser.isCompletedProfile,
+      },
+    });
+  } catch (error) {
+    res.status(400).json({
+      err: error.message,
+    });
+  }
+});
+
+
+router.post("/follow/:userId", isLoggedIn, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const loggedInUser = req.user;
+
+    // Can't follow yourself
+    if (userId === loggedInUser._id.toString()) {
+      throw new Error("You cannot follow yourself");
+    }
+
+    // Check if target user exists
+    const targetUser = await User.findById(userId);
+    if (!targetUser) {
+      throw new Error("User not found");
+    }
+
+    const isAlreadyFollowing = loggedInUser.following.includes(userId);
+
+    if (isAlreadyFollowing) {
+      // Unfollow: remove from both sides
+      await User.findByIdAndUpdate(loggedInUser._id, {
+        $pull: { following: userId },
+      });
+      await User.findByIdAndUpdate(userId, {
+        $pull: { followers: loggedInUser._id },
+      });
+
+      return res.status(200).json({
+        success: true,
+        msg: `You unfollowed ${targetUser.username}`,
+      });
+    } else {
+     
+      await User.findByIdAndUpdate(loggedInUser._id, {
+        $addToSet: { following: userId },
+      });
+      await User.findByIdAndUpdate(userId, {
+        $addToSet: { followers: loggedInUser._id },
+      });
+
+      return res.status(200).json({
+        success: true,
+        msg: `You are now following ${targetUser.username}`,
+      });
+    }
+  } catch (error) {
+    res.status(400).json({
+      err: error.message,
+    });
+  }
+});
+>>>>>>> a5405d4 (create follower and following routes)
 
 module.exports = {
-    profileRouter : router
-}
+  profileRouter: router,
+};
