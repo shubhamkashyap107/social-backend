@@ -20,22 +20,18 @@ router.post("/send-otp", async(req, res) => { // ratelimit
         await VerifiedMail.deleteOne({email})
 
 
-        if(!validator.isEmail(email))
-        {
-            throw new Error("Please enter a valid email...")
-        }
+     if (!validator.isEmail(email)) {
+       throw new Error("Please enter a valid email...");
+     }
+     const genOtp = String(Math.floor(Math.random() * 1000000)).padStart(
+       6,
+       "0"
+     );
 
-        var genOtp = String(Math.floor(Math.random() * 1000000))
-        if(genOtp.length == 5)
-        {
-            genOtp.padEnd(6, "0")
-        }
-        
-
-        const createdOtp = await OTP.create({
-            email,
-            otp : genOtp
-        })
+     const createdOtp = await OTP.create({
+       email,
+       otp: genOtp,
+     });
 
         await resend.emails.send({
             from: "Shubham <shubham@noisy.co.in>",
