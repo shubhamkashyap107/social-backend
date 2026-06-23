@@ -25,11 +25,7 @@ router.post("/send-otp", async(req, res) => { // ratelimit
             throw new Error("Please enter a valid email...")
         }
 
-        var genOtp = String(Math.floor(Math.random() * 1000000))
-        if(genOtp.length == 5)
-        {
-            genOtp.padEnd(6, "0")
-        }
+       var genOtp = String(Math.floor(Math.random() * 1000000)).padStart(6, "0")
         
 
         const createdOtp = await OTP.create({
