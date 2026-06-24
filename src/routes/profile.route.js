@@ -207,6 +207,7 @@ router.patch("/follow/:userId",isLoggedIn,async(req,res)=>{
 router.get("/search", isLoggedIn, async (req, res) => {
     try {
             const {query} = req.query
+            const foundUser = req.user
 
             if(!query || query.trim() === "")
             {
@@ -217,7 +218,8 @@ router.get("/search", isLoggedIn, async (req, res) => {
             }
 
             const users = User.find({
-                username : {$regex : query, $options : "i"} 
+                username : {$regex : query, $options : "i"},
+                _id : {$ne : foundUser.id} 
             })
             .select("username firstName lastName displayPicture")
 
