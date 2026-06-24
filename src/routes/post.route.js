@@ -155,6 +155,69 @@ router.put("/:id", isLoggedIn, async (req, res) => {
   }
 })
 
+router.post("/like/:id", isLoggedIn, async(req, res) => {
+  try {
+        const foundUser = req.user
+        const {id} = req.params
+
+        const post = await Post.findById(id)
+
+        if(!post)
+        {
+          throw new Error("Post not found")
+        }
+
+        if(!post.likes.includes(foundUser._id))
+        {
+          post.likes.push(foundUser._id)
+          await post.save()
+        }
+        
+        res.status(200).json({
+            success: true,
+            message: "Post liked successfully"
+        })
+
+  } catch (error) {
+      res.status(500).json({
+            success: false,
+            message: error.message
+        })
+  }
+})
+
+
+router.post("/dislike/:id", isLoggedIn, async(req, res) => {
+  try {
+        const foundUser = req.user 
+        const {id} = req.params
+        const post = await Post.findById(id)
+
+        if(!post)
+        {
+          throw new Error("Post not found")
+        }
+
+        post.likes.pull(foundUser._id)
+        await post.save()
+
+         res.status(200).json({
+            success: true,
+            message: "Post disliked successfully"
+        })
+
+
+
+
+
+  } catch (error) {
+    res.status(500).json({
+            success: false,
+            message: error.message
+        })
+  }
+})
+
 
 router.patch("/like/:postId", isLoggedIn, async (req, res) => {
   try 
