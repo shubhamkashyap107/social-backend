@@ -206,7 +206,7 @@ router.patch("/follow/:userId",isLoggedIn,async(req,res)=>{
 
 router.get("/search", isLoggedIn, async (req, res) => {
     try {
-            const {query} = req.query
+            const {query, skip} = req.query
             const foundUser = req.user
 
             if(!query || query.trim() === "")
@@ -222,6 +222,8 @@ router.get("/search", isLoggedIn, async (req, res) => {
                 _id : {$ne : foundUser.id} 
             })
             .select("username firstName lastName displayPicture")
+            .limit(5)
+            .skip(skip)
 
             res.status(200).json({
                 sucess : true,
