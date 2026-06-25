@@ -16,8 +16,9 @@ const isLoggedIn = async(req, res, next) => {
         req.user = foundUser
         next()
     } catch (error) {
-        res.json({
-            err : error.message,
+        res.status(401).json({
+            success: false,
+            err: error.message,
         })
     }
 }

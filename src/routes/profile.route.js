@@ -148,7 +148,7 @@ router.patch("/edit/dp", isLoggedIn, async(req, res) => {
 router.patch("/follow/:userId",isLoggedIn,async(req,res)=>{
     try 
     {
-        const {userId} = req.params();
+        const {userId} = req.params;
         const foundUser = req.user
 
         const targetUser = await User.findById(userId)
@@ -206,38 +206,116 @@ router.patch("/follow/:userId",isLoggedIn,async(req,res)=>{
 
 router.get("/search", isLoggedIn, async (req, res) => {
     try {
-            const {query} = req.query
-            const foundUser = req.user
+        const { query, limit = 10, skip = 0 } = req.query;
+        const foundUser = req.user;
 
-            if(!query || query.trim() === "")
-            {
-                return res.status(200).json({
-                    sucess : true,
-                    data : []
-                })
+        // Validate limit and skip
+        const parsedLimit = parseInt(limit);
+        const parsedSkip = parseInt(skip);
+
+        if (isNaN(parsedLimit) || parsedLimit <= 0) {
+            return res.status(400).json({
+                success: false,
+                err: "limit must be a positive integer"
+            });
+        }
+
+        if (isNaN(parsedSkip) || parsedSkip < 0) {
+            return res.status(400).json({
+                success: false,
+                err: "skip must be a non-negative integer"
+            });
+        }
+
+        // Enforce max limit of 50
+        const finalLimit = Math.min(parsedLimit, 50);
+
+        if (!query || query.trim() === "") {
+            return res.status(200).json({
+                success: true,
+                data: [],
+                pagination: {
+                    limit: finalLimit,
+                    skip: parsedSkip,
+                    totalCount: 0
+                }
+            });
+        }
+
+        const filter = {
+            username: { $regex: query, $options: "i" },
+            _id: { $ne: foundUser.id }
+        };
+
+        const [users, totalCount] = await Promise.all([
+            User.find(filter)
+                .select("username firstName lastName displayPicture")
+                .skip(parsedSkip)
+                .limit(finalLimit),
+            User.countDocuments(filter)
+        ]);
+
+        res.status(200).json({
+            success: true,
+            msg: "Users fetched",
+            data: users,
+            pagination: {
+                limit: finalLimit,
+                skip: parsedSkip,
+                totalCount
             }
-
-            const users = await User.find({
-                username : {$regex : query, $options : "i"},
-                _id : {$ne : foundUser.id} 
-            })
-            .select("username firstName lastName displayPicture")
-
-            res.status(200).json({
-                sucess : true,
-                msg: "Users fetched",
-                data: users
-            })
-
+        });
 
     } catch (error) {
-            res.status(400).json({
+        res.status(400).json({
             err: error.message
-        })
+        });
     }
+});
 
+router.get("/:username", isLoggedIn, async (req, res) => {
+    try {
+        const { username } = req.params;
+        const loggedInUser = req.user;
 
-})
+        const user = await User.findOne({ username })
+            .select("username firstName lastName displayPicture bio gender dateOfBirth followers following posts isCompletedProfile");
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                err: "User not found"
+            });
+        }
+
+        const isFollowing = loggedInUser.following.some(
+            (id) => id.toString() === user._id.toString()
+        );
+
+        res.status(200).json({
+            success: true,
+            data: {
+                _id: user._id,
+                username: user.username,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                displayPicture: user.displayPicture,
+                bio: user.bio,
+                gender: user.gender,
+                dateOfBirth: user.dateOfBirth,
+                isCompletedProfile: user.isCompletedProfile,
+                isFollowing,
+                followersCount: user.followers.length,
+                followingCount: user.following.length,
+                postsCount: user.posts.length
+            }
+        });
+    } catch (error) {
+        res.status(400).json({
+            err: error.message
+        });
+    }
+});
 
 
 module.exports = {
