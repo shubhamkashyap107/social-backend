@@ -240,37 +240,6 @@ router.get("/search", isLoggedIn, async (req, res) => {
 
 })
 
-router.get("/:id", isLoggedIn, async(req, res) => {
-    try {
-        const {id} = req.params
-        const foundUser = req.user
-
-        const user = await User.findById(id)
-        .select("username firstName lastName dateOfBirth followers following posts displayPicture bio ")
-        .populate("posts")
-
-        if(!user)
-        {
-            throw new Error("User not found")
-        }
-
-         const isFollowing = user.followers.some(
-            (followerId) => followerId.toString() === user.id
-        )
-
-        res.status(200).json({
-            success: true,
-            data : {
-                ...user.toObject(),
-                isFollowing
-            }
-        })
-    } catch (error) {
-         res.status(404).json({
-            err: error.message
-        })
-    }
-})
 
 module.exports = {
     profileRouter : router
