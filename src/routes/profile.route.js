@@ -148,7 +148,7 @@ router.patch("/edit/dp", isLoggedIn, async(req, res) => {
 router.patch("/follow/:userId",isLoggedIn,async(req,res)=>{
     try 
     {
-        const {userId} = req.params();
+        const {userId} = req.params
         const foundUser = req.user
 
         const targetUser = await User.findById(userId)
@@ -171,7 +171,7 @@ router.patch("/follow/:userId",isLoggedIn,async(req,res)=>{
             })
 
             targetUser.followers = targetUser.followers.filter((user)=>{
-                return user.toString() !== userId
+                return user.toString() !== foundUser._id.toString()
             })
 
             await foundUser.save()
