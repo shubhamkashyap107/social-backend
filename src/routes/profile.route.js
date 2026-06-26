@@ -255,7 +255,7 @@ router.get("/:id", isLoggedIn, async(req, res) => {
         }
 
          const isFollowing = user.followers.some(
-            (followerId) => followerId.toString() === user.id
+            (followerId) => followerId.toString() === foundUser.id
         )
 
         res.status(200).json({
