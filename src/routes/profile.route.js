@@ -254,7 +254,7 @@ router.get("/:id", isLoggedIn, async(req, res) => {
             throw new Error("User not found")
         }
 
-         const isFollowing = foundUser.followers.some(
+         const isFollowing = user.followers.some(
             (followerId) => followerId.toString() === user.id
         )
 
