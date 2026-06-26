@@ -272,8 +272,6 @@ router.get("/:id", isLoggedIn, async(req, res) => {
     }
 })
 
->>>>>>> 4af8c097df0ca52c2ce974c687aaf07c2bebcd51
-
 module.exports = {
     profileRouter : router
 }
