@@ -34,7 +34,7 @@ router.post("/send-otp", async(req, res) => { // ratelimit
         })
 
         await resend.emails.send({
-            from: "MyApp <onboarding@resend.dev>",
+            from: "Shubham <shubham@noisy.co.in>",
             to: email,
             subject: "OTP Verification",
             html: `

@@ -240,6 +240,27 @@ router.get("/search", isLoggedIn, async (req, res) => {
 
 })
 
+router.get("/profile/:id",isLoggedIn,async(req,res) =>{
+    try {
+        const foundUser = req.user
+        const {id} = req.params
+
+        if(id == foundUser._id){
+            res.status(400).json({
+                data : null
+            })
+        }
+
+        res.status(200).json({
+            status : "success",
+            data : foundUser
+        })
+    } catch (error) {
+        res.status(400).json({
+            status : "failed"
+        })
+    }
+})
 
 module.exports = {
     profileRouter : router
