@@ -216,12 +216,11 @@ router.get("/search", isLoggedIn, async (req, res) => {
                     data : []
                 })
             }
-
             const users = await User.find({
                 username : {$regex : query, $options : "i"},
                 _id : {$ne : foundUser.id} 
             })
-            .select("username firstName lastName displayPicture")
+            .select("username firstName lastName displayPicture _id")
             .limit(5)
             .skip(skip)
 
