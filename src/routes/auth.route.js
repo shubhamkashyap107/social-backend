@@ -293,7 +293,16 @@ router.get("/get-user-data", async(req, res) => {
     try {
         const {token} = req.cookies
         const obj = jwt.decode(token, process.env.JWT_SECRET)
-        const foundUser = await User.findById(obj.id).populate("posts")
+        const foundUser = await User.findById(obj.id).populate({
+            path: "posts",
+            populate: {
+            path: "comments",
+            populate: {
+            path: "authorId",
+            select: "username displayPicture firstName lastName"
+        }
+    }
+        })
 
         if(!foundUser)
         {
