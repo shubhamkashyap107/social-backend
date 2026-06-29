@@ -34,6 +34,8 @@ router.post("/create-comment", isLoggedIn, async(req, res) => {
               post.comments.push(newComment._id)
               await post.save()
 
+              await newComment.populate("authorId", "username displayPicture firstName lastName")
+
               res.status(201).json({
               success: true,
               msg: "Comment added",
