@@ -247,7 +247,16 @@ router.get("/:id", isLoggedIn, async(req, res) => {
 
         const user = await User.findById(id)
         .select("username firstName lastName dateOfBirth followers following posts displayPicture bio ")
-        .populate("posts")
+         .populate({
+            path: "posts",
+            populate: {
+            path: "comments",
+            populate: {
+                path: "authorId",
+                select: "username displayPicture firstName lastName"
+            }
+        }
+        })
 
         if(!user)
         {
