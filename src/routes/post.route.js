@@ -116,8 +116,6 @@ router.delete("/:postId", isLoggedIn, async (req, res) => {
     }
 })
 
-
-
 router.put("/:id", isLoggedIn, async (req, res) => {
   try {
     const { caption, imageUrl } = req.body;
@@ -154,7 +152,6 @@ router.put("/:id", isLoggedIn, async (req, res) => {
     });
   }
 })
-
 
 router.patch("/like/:postId", isLoggedIn, async (req, res) => {
   try 
@@ -205,6 +202,36 @@ router.patch("/like/:postId", isLoggedIn, async (req, res) => {
     });
   }
 })
+
+router.get("/posts", isLoggedIn, async (req, res) => {
+    try {
+        const user = req.user;
+
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = parseInt(req.query.skip) || 0;
+
+        const userIds = [user._id, ...user.following];
+
+        const posts = await Post.find({
+            authorId: { $in: userIds }
+        })
+        .populate("author", "username displayPicture")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+        res.status(200).json({
+            success: true,
+            data: posts
+        });
+
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        });
+    }
+});
 
 
 module.exports = {
