@@ -116,8 +116,6 @@ router.delete("/:postId", isLoggedIn, async (req, res) => {
     }
 })
 
-
-
 router.put("/:id", isLoggedIn, async (req, res) => {
   try {
     const { caption, imageUrl } = req.body;
@@ -154,7 +152,6 @@ router.put("/:id", isLoggedIn, async (req, res) => {
     });
   }
 })
-
 
 router.patch("/like/:postId", isLoggedIn, async (req, res) => {
   try 
