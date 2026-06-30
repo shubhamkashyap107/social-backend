@@ -203,35 +203,32 @@ router.patch("/like/:postId", isLoggedIn, async (req, res) => {
   }
 })
 
-router.get("/posts", isLoggedIn, async (req, res) => {
-    try {
-        const user = req.user;
+router.get("/getpost", isLoggedIn, async(req, res) => {
+  try {
+      const {skip} = req.query
+      const foundUser = req.user
+      const userId = foundUser._id
+      const followingIds = foundUser.following || []
 
-        const limit = parseInt(req.query.limit) || 10;
-        const skip = parseInt(req.query.skip) || 0;
+      const posts = await Post.find({
+        user: { $in: [userId, ...followingIds] },
+      })
+      .skip(skip)
+      .limit(10)
+      .populate("user", "username profileImage fullName")
 
-        const userIds = [user._id, ...user.following];
+      res.status(200).json({
+        success: true,
+        posts,
+      })
 
-        const posts = await Post.find({
-            authorId: { $in: userIds }
-        })
-        .populate("author", "username displayPicture")
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit);
 
-        res.status(200).json({
-            success: true,
-            data: posts
-        });
-
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            message: err.message
-        });
-    }
-});
+  } catch (error) {
+      res.status(400).json({
+        message : error.message
+      })
+  }
+})
 
 
 module.exports = {
