@@ -253,6 +253,7 @@ router.post("/login", async(req, res) => {
             success : true, 
             msg : "User Logged In",
             data : {
+                _id : foundUser._id,  
                 email : foundUser.email,
                 username : foundUser.username,
                 firstName : foundUser.firstName,
@@ -312,6 +313,7 @@ router.get("/get-user-data", async(req, res) => {
         res.status(200).json({
             success : true, 
             data : {
+                _id : foundUser._id,  
                 email : foundUser.email,
                 username : foundUser.username,
                 firstName : foundUser.firstName,

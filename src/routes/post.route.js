@@ -172,9 +172,7 @@ router.patch("/like/:postId", isLoggedIn, async (req, res) => {
     if (alreadyLiked) 
       {
       await Post.findByIdAndUpdate(req.params.postId, {
-        $pull: {
-          likes: userId,
-        },
+        $pull: { likes: userId },
       });
 
       return res.status(200).json({
@@ -184,9 +182,7 @@ router.patch("/like/:postId", isLoggedIn, async (req, res) => {
     }
 
     await Post.findByIdAndUpdate(req.params.postId, {
-      $push: {
-        likes: userId,
-      },
+      $addToSet: { likes: userId },   // 👈 yaha change
     });
 
     res.status(200).json({
