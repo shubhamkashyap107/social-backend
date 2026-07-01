@@ -56,8 +56,40 @@ router.get("/my-posts", isLoggedIn, async (req, res) => {
       err: error.message,
     });
   }
-});
+})
 
+router.get("/getpost", isLoggedIn, async(req, res) => {
+  try {
+      const {skip} = req.query
+      const foundUser = req.user
+      const userId = foundUser._id
+      const followingIds = foundUser.following || []
+
+      const posts = await Post.find({
+        authorId: { $in: [userId, ...followingIds] },
+      })
+      .skip(Number(skip) || 0)
+      .limit(10)
+      .populate("authorId", "username displayPicture firstName lastName")
+      .populate({
+      path: "comments",
+      populate: {
+      path: "authorId",
+      select: "firstName lastName displayPicture username"
+     }
+     })
+
+      res.status(200).json({
+        success: true,
+        posts,
+      })
+
+  } catch (error) {
+      res.status(400).json({
+        message : error.message
+      })
+  }
+})
 router.get("/:id", isLoggedIn, async(req, res) => {
     try {
             const {id} = req.params
@@ -115,6 +147,7 @@ router.delete("/:postId", isLoggedIn, async (req, res) => {
         })
     }
 })
+
 
 router.put("/:id", isLoggedIn, async (req, res) => {
   try {
@@ -199,32 +232,7 @@ router.patch("/like/:postId", isLoggedIn, async (req, res) => {
   }
 })
 
-router.get("/getpost", isLoggedIn, async(req, res) => {
-  try {
-      const {skip} = req.query
-      const foundUser = req.user
-      const userId = foundUser._id
-      const followingIds = foundUser.following || []
 
-      const posts = await Post.find({
-        user: { $in: [userId, ...followingIds] },
-      })
-      .skip(skip)
-      .limit(10)
-      .populate("user", "username profileImage fullName")
-
-      res.status(200).json({
-        success: true,
-        posts,
-      })
-
-
-  } catch (error) {
-      res.status(400).json({
-        message : error.message
-      })
-  }
-})
 
 
 module.exports = {

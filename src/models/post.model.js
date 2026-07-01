@@ -13,7 +13,8 @@ const postSchema = new mongoose.Schema({
     },
     authorId : {
         type : mongoose.Schema.Types.ObjectId,
-        required : true
+        required : true,
+        ref: "User",
     },
     likes : [{
         type : mongoose.Schema.Types.ObjectId,
