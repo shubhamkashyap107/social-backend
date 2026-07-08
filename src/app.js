@@ -6,6 +6,8 @@ const cp = require("cookie-parser")
 const { authRouter } = require("./routes/auth.route")
 const { profileRouter } = require("./routes/profile.route")
 const { postRouter } = require("./routes/post.route")
+const http = require("http")
+const fn = require("socket.io")
 
 const {commentRouter} = require("./routes/comment.route")
 
@@ -32,6 +34,26 @@ app.use((req, res) => {
 
 
 
+const server = http.createServer(app)
+const io = fn(server, {
+    cors : {
+        origin : [process.env.FRONTEND_URL],
+    }
+})
+
+io.on("connect", (socket) => {
+    console.log("Socket Connected")
+
+    socket.on("send-msg", (obj) => {
+       
+        io.emit("rec-msg", obj)
+
+
+    })
+
+
+})
+
 
 
 
@@ -41,7 +63,7 @@ mongoose.connect(process.env.MONGO_URL)
     console.log("DB Connected...")
     
     
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
         console.log("Server Running on PORT", PORT)
     })
 

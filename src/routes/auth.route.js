@@ -223,7 +223,7 @@ router.post("/login", async(req, res) => {
                 {email},
                 {username}
             ]
-        }).populate("posts")
+        }).populate("posts following followers")
 
 
 
