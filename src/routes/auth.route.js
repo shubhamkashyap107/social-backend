@@ -246,28 +246,30 @@ router.post("/login", async(req, res) => {
         const token = await jwt.sign({id : foundUser._id}, process.env.JWT_SECRET, {expiresIn : "1d"})
 
 
-
-        res.cookie("token", token, {
-            maxAge : 24 * 60 * 60 * 1000
-        }).status(200).json({
-            success : true, 
-            msg : "User Logged In",
-            data : {
-                _id : foundUser._id,  
-                email : foundUser.email,
-                username : foundUser.username,
-                firstName : foundUser.firstName,
-                lastName : foundUser.lastName,
-                bio : foundUser.bio,
-                gender : foundUser.gender,
-                dateOfBirth : foundUser.dateOfBirth,
-                displayPicture : foundUser.displayPicture,
-                followers : foundUser.followers,
-                following : foundUser.following,
-                posts : foundUser.posts,
-                isCompletedProfile : foundUser.isCompletedProfile
-            }
-        })
+res.cookie("token", token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    maxAge: 24 * 60 * 60 * 1000,
+}).status(200).json({
+    success: true,
+    msg: "User Logged In",
+    data: {
+        _id: foundUser._id,
+        email: foundUser.email,
+        username: foundUser.username,
+        firstName: foundUser.firstName,
+        lastName: foundUser.lastName,
+        bio: foundUser.bio,
+        gender: foundUser.gender,
+        dateOfBirth: foundUser.dateOfBirth,
+        displayPicture: foundUser.displayPicture,
+        followers: foundUser.followers,
+        following: foundUser.following,
+        posts: foundUser.posts,
+        isCompletedProfile: foundUser.isCompletedProfile
+    }
+});
 
     } catch (error) {
         res.status(404).json({
