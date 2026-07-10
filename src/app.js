@@ -8,11 +8,14 @@ const { profileRouter } = require("./routes/profile.route")
 const { postRouter } = require("./routes/post.route")
 const http = require("http")
 const fn = require("socket.io")
+const { Chat }  = require("./models/chat.model")
 
 const {commentRouter} = require("./routes/comment.route")
 
 const PORT = process.env.PORT || 8080
 const cors = require("cors")
+const { send } = require("process")
+const { chatRouter } = require("./routes/chat.route")
 
 
 app.use(cors({
@@ -25,6 +28,7 @@ app.use("/api/auth", authRouter)
 app.use("/api/profile", profileRouter)
 app.use("/api/post", postRouter)
 app.use("/api/comment", commentRouter)
+app.use("/api/chats", chatRouter)
 
 app.use((req, res) => {
     res.status(404).json({
@@ -42,12 +46,28 @@ const io = fn(server, {
 })
 
 io.on("connect", (socket) => {
-    console.log("Socket Connected")
+   
 
-    socket.on("send-msg", (obj) => {
-       
-        io.emit("rec-msg", obj)
 
+    socket.on("join-room", ({sender, receiver}) => {
+
+        const roomId = [sender.trim(), receiver.trim()].sort().join("")
+        socket.join(roomId)
+
+        socket.on("send-msg", async({text, sender}) => {
+
+            const newMsg = await Chat.create({
+                senderId : sender,
+                receiverId : receiver, 
+                text
+            })
+        
+
+
+
+            socket.to(roomId).emit("receive-msg", {text, sender})
+
+        })
 
     })
 
